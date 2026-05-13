@@ -3,564 +3,90 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة التحكم</title>
+<title>لوحة التحكم - نظام التيكتات</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0f; --surface: #111118; --surface2: #1a1a25; --surface3: #222233;
+    --bg: #0a0a0f; --surface: #111118; --surface2: #1a1a25;
     --border: #2a2a3a; --accent: #5865f2; --accent2: #7289da;
-    --text: #e8e8f0; --text2: #8888aa; --text3: #555570;
-    --success: #57f287; --danger: #ed4245; --warn: #fee75c;
+    --text: #e8e8f0; --text2: #8888aa;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans Arabic',sans-serif; min-height:100vh; display:flex; }
-
-  /* ── Sidebar ── */
-  .sidebar {
-    width: 260px; min-height: 100vh;
-    background: var(--surface);
-    border-left: 1px solid var(--border);
-    display: flex; flex-direction: column;
-    position: fixed; right: 0; top: 0; bottom: 0;
-    z-index: 100;
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    min-height: 100vh; display: flex;
+    align-items: center; justify-content: center;
   }
-  .sidebar-logo {
-    padding: 24px 20px; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 12px;
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0;
+    background-image: linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px; opacity: 0.3;
   }
-  .sidebar-logo .icon {
-    width: 40px; height: 40px;
+  .glow {
+    position: fixed; width: 600px; height: 600px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(88,101,242,0.15) 0%, transparent 70%);
+    top: -100px; left: 50%; transform: translateX(-50%); z-index: 0;
+    animation: pulse 4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+  .container {
+    position: relative; z-index: 1; text-align: center;
+    padding: 60px 40px;
+    background: rgba(17,17,24,0.85);
+    border: 1px solid var(--border); border-radius: 24px;
+    backdrop-filter: blur(20px); max-width: 480px; width: 90%;
+    animation: fadeUp 0.6s ease;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+  .logo {
+    width: 72px; height: 72px;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 12px; display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
+    border-radius: 20px; display: flex; align-items: center; justify-content: center;
+    font-size: 32px; margin: 0 auto 24px;
+    box-shadow: 0 0 40px rgba(88,101,242,0.4);
   }
-  .sidebar-logo span { font-weight: 700; font-size: 16px; }
-  .sidebar-logo small { color: var(--text2); font-size: 11px; display: block; }
-  nav { flex: 1; padding: 12px; }
-  .nav-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 14px; border-radius: 10px;
-    cursor: pointer; margin-bottom: 4px;
-    color: var(--text2); font-size: 14px; font-weight: 500;
-    transition: all 0.15s; border: none; background: none;
-    width: 100%; text-align: right; font-family: inherit;
+  h1 {
+    font-size: 28px; font-weight: 700; margin-bottom: 8px;
+    background: linear-gradient(135deg, #fff, var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
-  .nav-item:hover { background: var(--surface2); color: var(--text); }
-  .nav-item.active { background: rgba(88,101,242,0.15); color: var(--accent2); }
-  .nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
-  .sidebar-user {
-    padding: 16px; border-top: 1px solid var(--border);
-    display: flex; align-items: center; gap: 10px;
+  p { color: var(--text2); margin-bottom: 40px; line-height: 1.7; font-size: 15px; }
+  .badge {
+    display: inline-block;
+    background: rgba(88,101,242,0.15); border: 1px solid rgba(88,101,242,0.3);
+    color: var(--accent2); padding: 4px 14px; border-radius: 20px;
+    font-size: 12px; margin-bottom: 20px; letter-spacing: 0.5px;
   }
-  .sidebar-user img { width: 36px; height: 36px; border-radius: 50%; }
-  .sidebar-user .name { font-size: 13px; font-weight: 600; }
-  .sidebar-user .logout {
-    margin-right: auto; color: var(--text3); cursor: pointer;
-    font-size: 18px; background: none; border: none; padding: 4px;
-    transition: color 0.15s;
+  .btn-discord {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--accent); color: white; text-decoration: none;
+    padding: 16px 36px; border-radius: 14px;
+    font-size: 16px; font-weight: 600; font-family: inherit;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(88,101,242,0.4);
   }
-  .sidebar-user .logout:hover { color: var(--danger); }
-
-  /* ── Main ── */
-  .main { margin-right: 260px; flex: 1; padding: 32px; min-height: 100vh; }
-  .page { display: none; }
-  .page.active { display: block; }
-  .page-header { margin-bottom: 28px; }
-  .page-header h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-  .page-header p { color: var(--text2); font-size: 14px; }
-
-  /* ── Cards ── */
-  .card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 24px; margin-bottom: 20px;
+  .btn-discord:hover {
+    background: var(--accent2); transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(88,101,242,0.5);
   }
-  .card-title {
-    font-size: 15px; font-weight: 600; margin-bottom: 20px;
-    display: flex; align-items: center; gap: 8px; color: var(--text);
-  }
-  .card-title .dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent);
-  }
-
-  /* ── Stats Grid ── */
-  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .stat-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; padding: 20px;
-    position: relative; overflow: hidden;
-  }
-  .stat-card::before {
-    content: ''; position: absolute; top: 0; right: 0;
-    width: 60px; height: 60px; border-radius: 50%;
-    background: rgba(88,101,242,0.1);
-    transform: translate(20px,-20px);
-  }
-  .stat-label { font-size: 12px; color: var(--text2); margin-bottom: 8px; }
-  .stat-value { font-size: 28px; font-weight: 700; }
-  .stat-icon { font-size: 24px; margin-bottom: 10px; }
-
-  /* ── Form ── */
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .form-group { margin-bottom: 0; }
-  .form-group.full { grid-column: 1 / -1; }
-  label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 8px; font-weight: 500; }
-  select, input[type=text] {
-    width: 100%; background: var(--surface2);
-    border: 1px solid var(--border); border-radius: 10px;
-    padding: 11px 14px; color: var(--text); font-family: inherit; font-size: 14px;
-    transition: border-color 0.15s; outline: none;
-  }
-  select:focus, input[type=text]:focus { border-color: var(--accent); }
-  select option { background: var(--surface2); }
-
-  .toggle-group { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; }
-  .toggle-label { font-size: 14px; color: var(--text); }
-  .toggle-label small { display: block; color: var(--text2); font-size: 12px; margin-top: 2px; }
-  .toggle {
-    width: 44px; height: 24px; background: var(--surface3);
-    border-radius: 12px; position: relative; cursor: pointer;
-    border: 1px solid var(--border); transition: all 0.2s;
-  }
-  .toggle.on { background: var(--accent); border-color: var(--accent); }
-  .toggle::after {
-    content: ''; position: absolute; width: 18px; height: 18px;
-    background: white; border-radius: 50%; top: 2px; right: 2px;
-    transition: transform 0.2s;
-  }
-  .toggle.on::after { transform: translateX(-20px); }
-
-  /* ── Buttons ── */
-  .btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 10px 20px; border-radius: 10px; font-size: 14px;
-    font-weight: 600; cursor: pointer; border: none;
-    font-family: inherit; transition: all 0.15s;
-  }
-  .btn-primary { background: var(--accent); color: white; }
-  .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
-  .btn-danger { background: rgba(237,66,69,0.15); color: var(--danger); border: 1px solid rgba(237,66,69,0.3); }
-  .btn-danger:hover { background: var(--danger); color: white; }
-  .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-  .btn-sm { padding: 7px 14px; font-size: 13px; }
-  .btn-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-
-  /* ── Categories ── */
-  .cat-list { display: flex; flex-direction: column; gap: 10px; }
-  .cat-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 14px 16px; background: var(--surface2);
-    border: 1px solid var(--border); border-radius: 12px;
-    transition: border-color 0.15s;
-  }
-  .cat-item:hover { border-color: var(--accent); }
-  .cat-emoji { font-size: 22px; width: 36px; text-align: center; }
-  .cat-name { font-size: 14px; font-weight: 600; flex: 1; }
-  .cat-id { font-size: 11px; color: var(--text3); }
-  .add-cat-form {
-    display: grid; grid-template-columns: 80px 1fr auto;
-    gap: 10px; margin-top: 16px;
-  }
-  .emoji-input { text-align: center; font-size: 20px; }
-
-  /* ── Tickets Table ── */
-  .ticket-table { width: 100%; border-collapse: collapse; }
-  .ticket-table th {
-    text-align: right; padding: 12px 16px;
-    font-size: 12px; color: var(--text2); font-weight: 600;
-    border-bottom: 1px solid var(--border);
-  }
-  .ticket-table td {
-    padding: 14px 16px; font-size: 13px;
-    border-bottom: 1px solid rgba(42,42,58,0.5);
-  }
-  .ticket-table tr:last-child td { border-bottom: none; }
-  .badge-cat {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(88,101,242,0.15); color: var(--accent2);
-    padding: 4px 10px; border-radius: 20px; font-size: 12px;
-  }
-  .badge-open {
-    background: rgba(87,242,135,0.15); color: var(--success);
-    padding: 4px 10px; border-radius: 20px; font-size: 12px;
-  }
-
-  /* ── Toast ── */
-  .toast {
-    position: fixed; bottom: 24px; left: 24px;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 14px 20px;
-    font-size: 14px; z-index: 9999;
-    animation: slideIn 0.3s ease; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-  }
-  .toast.success { border-color: var(--success); color: var(--success); }
-  .toast.error { border-color: var(--danger); color: var(--danger); }
-  @keyframes slideIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-
-  /* ── Empty ── */
-  .empty { text-align: center; padding: 40px; color: var(--text2); }
-  .empty .icon { font-size: 48px; margin-bottom: 12px; }
-
-  .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
 </style>
 </head>
 <body>
-
-<!-- Sidebar -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="icon">🎫</div>
-    <div>
-      <span>نظام التيكتات</span>
-      <small>لوحة التحكم</small>
-    </div>
-  </div>
-  <nav>
-    <button class="nav-item active" onclick="showPage('overview')">
-      <span class="icon">📊</span> نظرة عامة
-    </button>
-    <button class="nav-item" onclick="showPage('settings')">
-      <span class="icon">⚙️</span> الإعدادات
-    </button>
-    <button class="nav-item" onclick="showPage('categories')">
-      <span class="icon">📋</span> الأقسام
-    </button>
-    <button class="nav-item" onclick="showPage('tickets')">
-      <span class="icon">🎟️</span> التيكتات
-    </button>
-  </nav>
-  <div class="sidebar-user">
-    <img id="user-avatar" src="" alt="">
-    <div class="name" id="user-name">...</div>
-    <button class="logout" onclick="location.href='/auth/logout'" title="تسجيل الخروج">⏻</button>
-  </div>
-</aside>
-
-<!-- Main -->
-<main class="main">
-
-  <!-- Overview -->
-  <div class="page active" id="page-overview">
-    <div class="page-header">
-      <h2>نظرة عامة</h2>
-      <p>ملخص حالة النظام</p>
-    </div>
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon">🎟️</div>
-        <div class="stat-label">التيكتات المفتوحة</div>
-        <div class="stat-value" id="stat-open">-</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">📋</div>
-        <div class="stat-label">الأقسام</div>
-        <div class="stat-value" id="stat-cats">-</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">✅</div>
-        <div class="stat-label">حالة الإعداد</div>
-        <div class="stat-value" id="stat-status" style="font-size:16px;margin-top:6px">-</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title"><span class="dot"></span> آخر التيكتات</div>
-      <table class="ticket-table">
-        <thead>
-          <tr>
-            <th>رقم</th><th>القسم</th><th>صاحب التيكت</th><th>الحالة</th>
-          </tr>
-        </thead>
-        <tbody id="recent-tickets">
-          <tr><td colspan="4"><div class="empty"><div class="icon">🎫</div>لا توجد تيكتات</div></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Settings -->
-  <div class="page" id="page-settings">
-    <div class="page-header">
-      <h2>الإعدادات</h2>
-      <p>أدخل IDs مباشرة من Discord</p>
-    </div>
-    <div class="card">
-      <div class="card-title"><span class="dot"></span> إعدادات القنوات</div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label>قناة لوحة التيكتات (Channel ID)</label>
-          <input type="text" id="set-panelChannel" placeholder="مثال: 1234567890123456789">
-        </div>
-        <div class="form-group">
-          <label>قناة اللوق (Channel ID)</label>
-          <input type="text" id="set-logChannel" placeholder="مثال: 1234567890123456789">
-        </div>
-        <div class="form-group">
-          <label>كاتيغوري التيكتات (Category ID)</label>
-          <input type="text" id="set-ticketCategory" placeholder="مثال: 1234567890123456789">
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title"><span class="dot"></span> إعدادات الرتب</div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label>رتبة الدعم (Role ID)</label>
-          <input type="text" id="set-supportRole" placeholder="مثال: 1234567890123456789">
-        </div>
-        <div class="form-group">
-          <label>رتبة الاداري (Role ID)</label>
-          <input type="text" id="set-adminRole" placeholder="مثال: 1234567890123456789">
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title"><span class="dot"></span> إعدادات عامة</div>
-      <div class="toggle-group">
-        <div class="toggle-label">
-          صاحب التيكت يقدر يغلقه
-          <small>إذا مفعّل، يقدر المستخدم يغلق تيكته بنفسه</small>
-        </div>
-        <div class="toggle" id="toggle-userclose" onclick="toggleUserClose()"></div>
-      </div>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="saveSettings()">💾 حفظ الإعدادات</button>
-    </div>
-  </div>
-
-  <!-- Categories -->
-  <div class="page" id="page-categories">
-    <div class="page-header">
-      <h2>الأقسام</h2>
-      <p>إدارة أقسام التيكتات</p>
-    </div>
-    <div class="card">
-      <div class="card-title"><span class="dot"></span> إضافة قسم جديد</div>
-      <div class="add-cat-form">
-        <input type="text" id="new-emoji" placeholder="🎫" class="emoji-input" maxlength="2">
-        <input type="text" id="new-catname" placeholder="اسم القسم">
-        <button class="btn btn-primary" onclick="addCategory()">+ إضافة</button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title"><span class="dot"></span> الأقسام الحالية</div>
-      <div class="cat-list" id="cat-list">
-        <div class="empty"><div class="icon">📋</div>لا توجد أقسام بعد</div>
-      </div>
-    </div>
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="sendPanel()">📤 إرسال اللوحة لـ Discord</button>
-    </div>
-  </div>
-
-  <!-- Tickets -->
-  <div class="page" id="page-tickets">
-    <div class="page-header">
-      <h2>التيكتات المفتوحة</h2>
-      <p>جميع التيكتات النشطة</p>
-    </div>
-    <div class="card">
-      <table class="ticket-table">
-        <thead>
-          <tr><th>رقم</th><th>القسم</th><th>صاحب التيكت</th><th>الحالة</th></tr>
-        </thead>
-        <tbody id="tickets-body">
-          <tr><td colspan="4"><div class="empty"><div class="icon">🎫</div>لا توجد تيكتات مفتوحة</div></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-</main>
-
-<script>
-let settings = {};
-let categories = [];
-let userCloseEnabled = false;
-
-// ── Navigation ──
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  event.currentTarget.classList.add('active');
-  if (name === 'overview') loadOverview();
-  if (name === 'categories') loadCategories();
-  if (name === 'tickets') loadTickets();
-}
-
-// ── Toast ──
-function toast(msg, type = 'success') {
-  const t = document.createElement('div');
-  t.className = `toast ${type}`;
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
-}
-
-// ── Load User ──
-async function loadUser() {
-  const r = await fetch('/api/me');
-  const data = await r.json();
-  if (!data.auth) return location.href = '/';
-  const u = data.user;
-  document.getElementById('user-name').textContent = u.username;
-  document.getElementById('user-avatar').src = u.avatar
-    ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`
-    : `https://cdn.discordapp.com/embed/avatars/0.png`;
-}
-
-// ── Load Settings ──
-async function loadSettings() {
-  const r = await fetch('/api/settings');
-  settings = await r.json();
-  document.getElementById('set-panelChannel').value = settings.panelChannel || '';
-  document.getElementById('set-logChannel').value = settings.logChannel || '';
-  document.getElementById('set-ticketCategory').value = settings.ticketCategory || '';
-  document.getElementById('set-supportRole').value = settings.supportRole || '';
-  document.getElementById('set-adminRole').value = settings.adminRole || '';
-  userCloseEnabled = settings.allowUserClose || false;
-  const toggle = document.getElementById('toggle-userclose');
-  if (userCloseEnabled) toggle.classList.add('on');
-}
-
-function toggleUserClose() {
-  userCloseEnabled = !userCloseEnabled;
-  const toggle = document.getElementById('toggle-userclose');
-  toggle.classList.toggle('on', userCloseEnabled);
-}
-
-async function saveSettings() {
-  const body = {
-    panelChannel: document.getElementById('set-panelChannel').value.trim(),
-    logChannel: document.getElementById('set-logChannel').value.trim(),
-    ticketCategory: document.getElementById('set-ticketCategory').value.trim(),
-    supportRole: document.getElementById('set-supportRole').value.trim(),
-    adminRole: document.getElementById('set-adminRole').value.trim(),
-    allowUserClose: userCloseEnabled,
-  };
-  const r = await fetch('/api/settings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
-  const data = await r.json();
-  if (data.success) toast('✅ تم حفظ الإعدادات');
-  else toast('❌ صار خطأ', 'error');
-}
-
-// ── Categories ──
-async function loadCategories() {
-  const r = await fetch('/api/categories');
-  categories = await r.json();
-  renderCategories();
-}
-
-function renderCategories() {
-  const list = document.getElementById('cat-list');
-  if (categories.length === 0) {
-    list.innerHTML = '<div class="empty"><div class="icon">📋</div>لا توجد أقسام بعد</div>';
-    return;
-  }
-  list.innerHTML = categories.map(c => `
-    <div class="cat-item">
-      <div class="cat-emoji">${c.emoji}</div>
-      <div>
-        <div class="cat-name">${c.name}</div>
-        <div class="cat-id">ID: ${c.id}</div>
-      </div>
-      <button class="btn btn-danger btn-sm" onclick="deleteCategory('${c.id}')">🗑️ حذف</button>
-    </div>
-  `).join('');
-}
-
-async function addCategory() {
-  const name = document.getElementById('new-catname').value.trim();
-  const emoji = document.getElementById('new-emoji').value.trim() || '🎫';
-  if (!name) return toast('أدخل اسم القسم', 'error');
-  const r = await fetch('/api/categories', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ name, emoji })
-  });
-  const data = await r.json();
-  if (data.success) {
-    toast('✅ تم إضافة القسم');
-    document.getElementById('new-catname').value = '';
-    document.getElementById('new-emoji').value = '';
-    loadCategories();
-  } else toast(data.error || 'صار خطأ', 'error');
-}
-
-async function deleteCategory(id) {
-  if (!confirm('هل تبي تحذف هذا القسم؟')) return;
-  const r = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
-  const data = await r.json();
-  if (data.success) { toast('✅ تم الحذف'); loadCategories(); }
-  else toast('صار خطأ', 'error');
-}
-
-async function sendPanel() {
-  toast('📤 جاري إرسال اللوحة...');
-  // نبلغ البوت عبر ملف مشترك
-  const r = await fetch('/api/send-panel', { method: 'POST' });
-  const data = await r.json();
-  if (data.success) toast('✅ تم إرسال اللوحة!');
-  else toast(data.error || 'تأكد من إعداد القناة والأقسام', 'error');
-}
-
-// ── Overview ──
-async function loadOverview() {
-  const [sR, cR, tR] = await Promise.all([
-    fetch('/api/settings'), fetch('/api/categories'), fetch('/api/tickets')
-  ]);
-  const s = await sR.json();
-  const c = await cR.json();
-  const t = await tR.json();
-
-  document.getElementById('stat-cats').textContent = c.length;
-  const ticketCount = Object.keys(t).length;
-  document.getElementById('stat-open').textContent = ticketCount;
-
-  const configured = s.panelChannel && s.supportRole && c.length > 0;
-  document.getElementById('stat-status').textContent = configured ? '✅ جاهز' : '⚠️ ناقص';
-
-  const tbody = document.getElementById('recent-tickets');
-  if (ticketCount === 0) {
-    tbody.innerHTML = '<tr><td colspan="4"><div class="empty"><div class="icon">🎫</div>لا توجد تيكتات</div></td></tr>';
-    return;
-  }
-  tbody.innerHTML = Object.entries(t).slice(0, 5).map(([chId, tk]) => `
-    <tr>
-      <td><strong>#${tk.number}</strong></td>
-      <td><span class="badge-cat">${tk.category}</span></td>
-      <td><code>${tk.userId}</code></td>
-      <td><span class="badge-open">مفتوح</span></td>
-    </tr>
-  `).join('');
-}
-
-// ── Tickets ──
-async function loadTickets() {
-  const r = await fetch('/api/tickets');
-  const tickets = await r.json();
-  const tbody = document.getElementById('tickets-body');
-  const entries = Object.entries(tickets);
-  if (entries.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="4"><div class="empty"><div class="icon">🎫</div>لا توجد تيكتات مفتوحة</div></td></tr>';
-    return;
-  }
-  tbody.innerHTML = entries.map(([chId, tk]) => `
-    <tr>
-      <td><strong>#${tk.number}</strong></td>
-      <td><span class="badge-cat">${tk.category}</span></td>
-      <td><code>${tk.userId}</code></td>
-      <td><span class="badge-open">مفتوح</span></td>
-    </tr>
-  `).join('');
-}
-
-// ── Init ──
-loadUser();
-loadSettings();
-loadOverview();
-</script>
+<div class="bg-grid"></div>
+<div class="glow"></div>
+<div class="container">
+  <div class="logo">🎫</div>
+  <div class="badge">لوحة تحكم النظام</div>
+  <h1>نظام التيكتات</h1>
+  <p>سجّل دخولك عبر Discord للوصول إلى لوحة التحكم وإدارة إعدادات التيكتات بالكامل</p>
+  <a href="/auth/discord" class="btn-discord">
+    <svg width="20" height="20" viewBox="0 0 71 55" fill="white">
+      <path d="M60.1 4.9A58.6 58.6 0 0 0 45.5.3a40.5 40.5 0 0 0-1.8 3.7 54.2 54.2 0 0 0-16.4 0A38.9 38.9 0 0 0 25.5.3 58.5 58.5 0 0 0 10.9 4.9C1.6 18.7-1 32.2.3 45.5a59 59 0 0 0 18 9.1 44.4 44.4 0 0 0 3.8-6.2 38.4 38.4 0 0 1-6-2.9l1.5-1.1a42 42 0 0 0 36.1 0l1.5 1.1a38.4 38.4 0 0 1-6 2.9 44.4 44.4 0 0 0 3.8 6.2 58.8 58.8 0 0 0 18-9.1C72.6 30 69.2 16.6 60.1 4.9ZM23.7 37.3c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2c3.5 0 6.5 3.2 6.4 7.2 0 4-2.9 7.2-6.4 7.2Zm23.6 0c-3.5 0-6.4-3.2-6.4-7.2s2.8-7.2 6.4-7.2c3.5 0 6.5 3.2 6.4 7.2 0 4-2.9 7.2-6.4 7.2Z"/>
+    </svg>
+    تسجيل الدخول بـ Discord
+  </a>
+</div>
 </body>
 </html>
